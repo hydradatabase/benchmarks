@@ -1,0 +1,3 @@
+results/*
+clickbench/data/*.tsv
+tpc-h/data/*.csv
