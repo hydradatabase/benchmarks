@@ -13,3 +13,5 @@
 \copy region FROM 'tpc-h/data/region.csv' WITH (FORMAT csv, DELIMITER '|');
 
 \copy supplier FROM 'tpc-h/data/supplier.csv' WITH (FORMAT csv, DELIMITER '|');
+
+ANALYZE;

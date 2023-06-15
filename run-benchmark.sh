@@ -1,15 +1,12 @@
 #!/bin/bash
 
-set -o nounset
-
 RUNTIME=`date "+%Y-%m-%d.%H:%M:%S"`
 TRIES=3
 
 LOAD=true
-BENCHMARK=clickbench
-VARIANT=zstd
+DIRNAME=$(dirname -- "$0")
 
-while getopts 'b:v:u:nh' OPTION; do
+while getopts 'b:v:u:t:nh' OPTION; do
   case "$OPTION" in
     b)
       BENCHMARK="$OPTARG"
@@ -23,17 +20,21 @@ while getopts 'b:v:u:nh' OPTION; do
     n)
       LOAD=false
       ;;
+    t)
+      TAG="$OPTARG"
+      ;;
     h)
-      echo "run.sh [-b benchmark] [-v variant] [-n]"
+      echo "run-benchmark.sh [-b benchmark] [-v variant] [-n]"
       echo "   -b benchmark to run: clickbench, tpc-h, or pgbench"
       echo "   -v variant to use: cached, uncompressed, or zstd"
       echo "   -n disables loading and deleting of data"
       echo "   -u user to run psql as"
+      echo "   -t tag"
       echo "   -h this help"
       exit 0
       ;;
     ?)
-      echo "run.sh [-b benchmark] [-v variant] [-n]" >&2
+      echo "run-benchmark.sh [-b benchmark] [-v variant] [-n]" >&2
       exit 1
       ;;
   esac
@@ -50,28 +51,38 @@ if [ -z "${VARIANT-}" ] ; then
   exit 1
 fi
 
+cd $DIRNAME
+
+if [ -z "${TAG}" ] ; then
+  PATHNAME=results/$BENCHMARK/$VARIANT/$RUNTIME
+  ANALYZED=results/$BENCHMARK-$VARIANT-$RUNTIME.json
+else
+  PATHNAME=results/$BENCHMARK/$VARIANT/$TAG/$RUNTIME
+  ANALYZED=results/$BENCHMARK-$VARIANT-$TAG-$RUNTIME.json
+fi
 
 # set up the output directory
-mkdir -p results/$BENCHMARK/$VARIANT/$RUNTIME
+mkdir -p $PATHNAME
+
 
 if [ "$LOAD" = true ] ; then
   createdb -U $USER $BENCHMARK
 fi
 
 
-psql -U $USER $BENCHMARK -f variants/$VARIANT/setup.sql -f $BENCHMARK/setup.sql >results/$BENCHMARK/$VARIANT/$RUNTIME/setup.out
-psql -U $USER $BENCHMARK -f variants/$VARIANT/data.sql -f $BENCHMARK/data.sql >results/$BENCHMARK/$VARIANT/$RUNTIME/data.out
+psql -U $USER $BENCHMARK -f variants/$VARIANT/setup.sql -f $BENCHMARK/setup.sql >$PATHNAME/setup.out
+psql -U $USER $BENCHMARK -f variants/$VARIANT/data.sql -f $BENCHMARK/data.sql >$PATHNAME/data.out
 
 for query in $BENCHMARK/queries/*; do
   sync
   echo 3 | tee /proc/sys/vm/drop_caches
   file=`echo $query | cut -f 3 -d '/'`
   for i in $(seq 1 $TRIES); do
-    psql -U $USER $BENCHMARK -f variants/$VARIANT/query.sql -f $query >results/$BENCHMARK/$VARIANT/$RUNTIME/$file-$i.out
+    psql -U $USER $BENCHMARK -f variants/$VARIANT/query.sql -f $query >$PATHNAME/$file-$i.out
   done
 done
 
-./analyze.js results/$BENCHMARK/$VARIANT/$RUNTIME > results/$BENCHMARK-$VARIANT-$RUNTIME.json
+./analyze.js $PATHNAME > $ANALYZED
 
 if [ "$LOAD" = true ] ; then
   dropdb -U $USER $BENCHMARK
