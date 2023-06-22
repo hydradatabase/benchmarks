@@ -25,7 +25,7 @@ while getopts 'b:v:u:t:nh' OPTION; do
       ;;
     h)
       echo "run-benchmark.sh [-b benchmark] [-v variant] [-n]"
-      echo "   -b benchmark to run: clickbench, tpc-h, or pgbench"
+      echo "   -b benchmark to run: clickbench, warehouse, or pgbench"
       echo "   -v variant to use: cached, uncompressed, or zstd"
       echo "   -n disables loading and deleting of data"
       echo "   -u user to run psql as"

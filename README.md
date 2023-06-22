@@ -5,7 +5,7 @@ A test runner for multiple testing frameworks.
 Tests currently:
 
 - clickbench - Clickbench tests
-- tpc-h - TPC-H tests
+- warehouse - TPC-H like warehouse tests
 
 Existing variants:
 
@@ -19,7 +19,7 @@ The cleanest option for running against multiple tags or commits is to use
 `run-all-for-tags.sh` which will set up a Docker container and run the tests
 automatically for all tags listed in the arguments.
 
-This will build a Hydra Columnar container, run `zstd` and `tpc-h`, create
+This will build a Hydra Columnar container, run `zstd` and `warehouse`, create
 an analysis file for each, and clean up when complete. Note that this only
 runs for a single variant, but does all benchmarks for each tag:
 
@@ -45,7 +45,7 @@ In addition, you can use the test runner to run locally, as long as you have
 a local Postgres server running.
 
 ```sh
-./run-benchmark.sh -b tpc-h -v zstd -u postgres
+./run-benchmark.sh -b warehouse -v zstd -u postgres
 ```
 
 There are options available for running the benchmarks directly:
@@ -54,7 +54,7 @@ There are options available for running the benchmarks directly:
 | ------ | ------------------------------------------------- | ------------ |
 | `-u`   | User to execute `psql` and related as             | `postgres`   |
 | `-v`   | Variant to run (`zstd`, `cached`, `uncompressed`) | `zstd`       |
-| `-b`   | Benchmark to run (`clickbench`, `tpc-h`)          | `clickbench` |
+| `-b`   | Benchmark to run (`clickbench`, `warehouse`)      | `clickbench` |
 | `-t`   | Optional tag for output                           | none         |
 | `-n`   | Disables loading and deleting of data             | off          |
 

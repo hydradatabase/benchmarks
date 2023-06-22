@@ -7,7 +7,7 @@ VARIANT=zstd
 DIRNAME=$(dirname -- "$0")
 USER=postgres
 
-declare -a BENCHMARKS=("clickbench" "tpc-h")
+declare -a BENCHMARKS=("clickbench" "warehouse")
 
 while getopts 'c:m:u:i:v:h' OPTION; do
   case "$OPTION" in
