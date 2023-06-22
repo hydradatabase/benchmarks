@@ -1,7 +1,9 @@
 #!/bin/bash
 
-RUNTIME=`date "+%Y-%m-%d.%H:%M:%S"`
-TRIES=3
+if [ -z "${RUNTIME}" ] ; then
+  RUNTIME=`date "+%Y-%m-%d.%H:%M:%S"`
+fi
+TRIES=${TRIES:-3}
 
 LOAD=true
 DIRNAME=$(dirname -- "$0")
