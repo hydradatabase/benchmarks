@@ -5,10 +5,11 @@ if [ -z "${RUNTIME}" ] ; then
 fi
 TRIES=${TRIES:-3}
 
+ANALYZE=true
 LOAD=true
 DIRNAME=$(dirname -- "$0")
 
-while getopts 'b:v:u:t:nh' OPTION; do
+while getopts 'b:v:u:t:znh' OPTION; do
   case "$OPTION" in
     b)
       BENCHMARK="$OPTARG"
@@ -22,6 +23,9 @@ while getopts 'b:v:u:t:nh' OPTION; do
     n)
       LOAD=false
       ;;
+    z)
+      ANALYZE=false
+      ;;
     t)
       TAG="$OPTARG"
       ;;
@@ -31,6 +35,7 @@ while getopts 'b:v:u:t:nh' OPTION; do
       echo "   -v variant to use: cached, uncompressed, or zstd"
       echo "   -n disables loading and deleting of data"
       echo "   -u user to run psql as"
+      echo "   -z disables analyzing data"
       echo "   -t tag"
       echo "   -h this help"
       exit 0
@@ -84,7 +89,9 @@ for query in $BENCHMARK/queries/*; do
   done
 done
 
-./analyze.js $PATHNAME > $ANALYZED
+if [ "$ANALYZE" = true ] ; then
+  ./analyze.js $PATHNAME > $ANALYZED
+fi
 
 if [ "$LOAD" = true ] ; then
   dropdb -U $USER $BENCHMARK
