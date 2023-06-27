@@ -60,7 +60,7 @@ const run = async () => {
   }
 
   const results = {};
-  results['_total'] = 0;
+  results['total'] = 0;
   for (const key in entries) {
     const entry = entries[key];
     const avg = entry.value / entry.count;
