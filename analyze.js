@@ -66,7 +66,7 @@ const run = async () => {
     const avg = entry.value / entry.count;
     results[key] = avg;
     results['total'] += avg;
-    if (!Number.isNaN(Number(key)) {
+    if (!Number.isNaN(Number(key))) {
       results['queries'] += avg;
     }
   }
