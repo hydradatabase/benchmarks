@@ -60,10 +60,15 @@ const run = async () => {
   }
 
   const results = {};
+  results['total'] = results['queries'] = 0;
   for (const key in entries) {
     const entry = entries[key];
-
-    results[key] = entry.value / entry.count;
+    const avg = entry.value / entry.count;
+    results[key] = avg;
+    results['total'] += avg;
+    if (!Number.isNaN(Number(key)) {
+      results['queries'] += avg;
+    }
   }
 
   console.log(JSON.stringify(results));
