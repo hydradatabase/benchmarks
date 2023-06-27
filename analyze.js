@@ -60,13 +60,14 @@ const run = async () => {
   }
 
   const results = {};
-  results['total'] = 0;
+  results['_total'] = 0;
   for (const key in entries) {
     const entry = entries[key];
     const avg = entry.value / entry.count;
     results[key] = avg;
     results['total'] += avg;
   }
+  results['queries'] = results['total'] - (results['data'] || 0) - (results['setup'] || 0)
 
   console.log(JSON.stringify(results));
 };
