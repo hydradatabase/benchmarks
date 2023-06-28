@@ -1,3 +1,5 @@
 results/*
 clickbench/data/*.tsv
+clickbench/data/*.tsv.gz
 warehouse/data/*.csv
+warehouse/data/*.csv.gz
