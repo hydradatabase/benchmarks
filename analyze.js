@@ -17,7 +17,7 @@ const entryForFile = (filename) => {
     return;
   }
 
-  const parts = fileparts[1].match(/(.+).sql/);
+  const parts = fileparts[1].match(/(.+)\.sql/);
   if (!parts) {
     return fileparts[1];
   }
@@ -36,7 +36,7 @@ const processFile = async (filename) => {
   const lines = data.split('\n');
 
   for (let line of lines) {
-    const parts = line.match(/Time: (\d+.\d+)/);
+    const parts = line.match(/Time: (\d+\.\d+)/);
     if (parts) {
       const time = Number(parts[1]);
       if (entries[entry]) {
