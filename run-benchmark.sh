@@ -73,7 +73,7 @@ mkdir -p $PATHNAME
 
 
 if [ "$LOAD" = true ] ; then
-  psql -U $USER -c "CREATE DATABASE $BENCHMARK"
+  psql -U $USER -c "CREATE DATABASE \"$BENCHMARK\""
 fi
 
 psql -U $USER $BENCHMARK -f variants/$VARIANT/setup.sql -f $BENCHMARK/setup.sql >$PATHNAME/setup.out 2>$PATHNAME/setup.err
@@ -99,5 +99,5 @@ if [ "$ANALYZE" = true ] ; then
 fi
 
 if [ "$LOAD" = true ] ; then
-  psql -U $USER -c "DROP DATABASE $BENCHMARK"
+  psql -U $USER -c "DROP DATABASE \"$BENCHMARK\""
 fi
