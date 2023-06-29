@@ -35,6 +35,7 @@ fi
 : "${UPLOAD_RESULTS_TO_S3:=true}"
 : "${UPLOAD_RESULTS_TO_BENCHER:=true}"
 : "${CLEANUP_FILES:=false}"
+: "${USE_BENCHER_BACKDATE:=false}"
 
 setup_data_dir() {
   if [ ! -e "$BENCHMARK" ]; then
@@ -71,12 +72,20 @@ upload_result_to_s3() {
 
 upload_result_to_bencher() {
   set +u
-  bencher run \
-    --if-branch "$GITHUB_REF_NAME" \
-    --else-if-branch "$GITHUB_BASE_REF" \
-    --else-if-branch main \
-    --backdate $(cat unix-timestamp.txt) \
-    "cat ./analyze-bencher.json"
+  if [ $USE_BENCHER_BACKDATE = true ]; then
+    bencher run \
+      --if-branch "$GITHUB_REF_NAME" \
+      --else-if-branch "$GITHUB_BASE_REF" \
+      --else-if-branch main \
+      --backdate $(cat unix-timestamp.txt) \
+      "cat ./analyze-bencher.json"
+  else
+    bencher run \
+      --if-branch "$GITHUB_REF_NAME" \
+      --else-if-branch "$GITHUB_BASE_REF" \
+      --else-if-branch main \
+      "cat ./analyze-bencher.json"
+  fi
   set -u
 }
 
