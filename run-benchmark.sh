@@ -73,12 +73,17 @@ mkdir -p $PATHNAME
 
 
 if [ "$LOAD" = true ] ; then
-  createdb -U $USER $BENCHMARK
+  psql -U $USER -c "CREATE DATABASE \"$BENCHMARK\""
 fi
 
+psql -U $USER $BENCHMARK -f variants/$VARIANT/setup.sql -f $BENCHMARK/setup.sql >$PATHNAME/setup.out 2>$PATHNAME/setup.err
+psql -U $USER $BENCHMARK -f variants/$VARIANT/data.sql -f $BENCHMARK/data.sql >$PATHNAME/data.out 2>$PATHNAME/data.err
 
-psql -U $USER $BENCHMARK -f variants/$VARIANT/setup.sql -f $BENCHMARK/setup.sql >$PATHNAME/setup.out
-psql -U $USER $BENCHMARK -f variants/$VARIANT/data.sql -f $BENCHMARK/data.sql >$PATHNAME/data.out
+if [ "$(cat $PATHNAME/*.err | grep -v NOTICE | wc -l)" != "0" ]; then
+  echo Error detected:
+  cat $PATHNAME/*.err
+  exit 1
+fi
 
 for query in $BENCHMARK/queries/*; do
   sync
@@ -94,5 +99,5 @@ if [ "$ANALYZE" = true ] ; then
 fi
 
 if [ "$LOAD" = true ] ; then
-  dropdb -U $USER $BENCHMARK
+  psql -U $USER -c "DROP DATABASE \"$BENCHMARK\""
 fi
