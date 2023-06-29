@@ -63,12 +63,12 @@ prepare_data() {
 }
 
 download_data() {
-  aws s3 cp --recursive s3://hydra-benchmarks/data/$BENCHMARK ./$BENCHMARK/data
+  aws s3 cp --no-progress --recursive s3://hydra-benchmarks/data/$BENCHMARK ./$BENCHMARK/data
 }
 
 upload_result_to_s3() {
-  aws s3 cp ./results.json s3://hydra-benchmarks/results/$BASE_IMAGE-$BENCHMARK-$VARIANT-$TAG.json
-  aws s3 cp ./bencher-with-metadata.json s3://hydra-benchmarks/bencher-results/$BASE_IMAGE-$BENCHMARK-$VARIANT-$TAG.json
+  aws s3 cp --no-progress ./results.json s3://hydra-benchmarks/results/$BASE_IMAGE-$BENCHMARK-$VARIANT-$TAG.json
+  aws s3 cp --no-progress ./bencher-with-metadata.json s3://hydra-benchmarks/bencher-results/$BASE_IMAGE-$BENCHMARK-$VARIANT-$TAG.json
 }
 
 upload_result_to_bencher() {
