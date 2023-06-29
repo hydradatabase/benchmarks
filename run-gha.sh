@@ -18,7 +18,14 @@ set -eux
 : "${BASE_IMAGE:=$( [[ $REPO =~ "ghcr.io" ]] && echo "postgres" || echo "spilo" )}"
 : "${BENCHER_PROJECT:=hydra-$BASE_IMAGE}"
 : "${BENCHER_TESTBED:=localhost}"
+
 BENCHER_ADAPTER=json
+if [ "$(uname -s)" = Darwin ]; then
+  # need gnu date for consistency; 'brew install date'
+  DATE=gdate
+else
+  DATE=date
+fi
 
 # required to be manually set or passed in if you want to use bencher
 # BENCHER_API_TOKEN=
@@ -88,8 +95,8 @@ stop_docker() {
 }
 
 analyze_results() {
-   docker inspect $REPO:$TAG | jq ".[0] | { metadata: { timestamp: .Created, repo: \"$REPO\", tag: \"$TAG\", benchmark: \"$BENCHMARK\", testbed: \"$BENCHER_TESTBED\" } }" >./metadata.json
-   jq -r .metadata.timestamp ./metadata.json | cut -f 1 -d . | xargs date -jf '%FT%T' +%s >./unix-timestamp.txt
+  docker inspect $REPO:$TAG | jq ".[0] | { metadata: { timestamp: .Created, repo: \"$REPO\", tag: \"$TAG\", benchmark: \"$BENCHMARK\", testbed: \"$BENCHER_TESTBED\" } }" >./metadata.json
+  $DATE -d $(jq -r .metadata.timestamp ./metadata.json) +%s >./unix-timestamp.txt
   ./analyze.js ./results/$BENCHMARK/$VARIANT/$RUNTIME > ./analyze.json
   ./analyze-bencher.js ./results/$BENCHMARK/$VARIANT/$RUNTIME $BENCHMARK >./analyze-bencher.json
   jq -s '.[0] * .[1]' ./analyze.json ./metadata.json >./results.json
