@@ -33,7 +33,11 @@ const processFile = async (filename) => {
   }
   const data = await readFile(filename, 'utf-8');
   const lines = data.split('\n');
+
   let result;
+  if (entries[entry]) {
+    result = entries[entry]['query-time'];
+  }
 
   for (let line of lines) {
     const parts = line.match(/Time: (\d+\.\d+)/);
@@ -42,7 +46,12 @@ const processFile = async (filename) => {
       if (result) {
         result.count++;
         result.sum += time;
-        result.value = result.sum / result.count;
+        // data and setup should use sum, not average
+        if (Number.isNaN(Number(entry))) {
+          result.value = result.sum;
+        } else {
+          result.value = result.sum / result.count;
+        }
         if (time < result.lower_bound)
           result.lower_bound = time;
         if (time > result.upper_bound)
@@ -59,8 +68,9 @@ const processFile = async (filename) => {
     }
   }
 
-  if (result)
+  if (result) {
     entries[entry] = { 'query-time': result };
+  }
 };
 
 const addPropertyPrefix = (obj, prefix) => {
