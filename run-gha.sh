@@ -18,15 +18,6 @@ set -eux
 : "${BASE_IMAGE:=$( [[ $REPO =~ "ghcr.io" ]] && echo "postgres" || echo "spilo" )}"
 : "${BENCHER_PROJECT:=hydra-$BASE_IMAGE}"
 : "${BENCHER_TESTBED:=localhost}"
-
-BENCHER_ADAPTER=json
-if [ "$(uname -s)" = Darwin ]; then
-  # need gnu date for consistency; 'brew install date'
-  DATE=gdate
-else
-  DATE=date
-fi
-
 # required to be manually set or passed in if you want to use bencher
 # BENCHER_API_TOKEN=
 
@@ -36,6 +27,16 @@ fi
 : "${UPLOAD_RESULTS_TO_BENCHER:=true}"
 : "${CLEANUP_FILES:=false}"
 : "${USE_BENCHER_BACKDATE:=false}"
+
+# internal settings
+BENCHER_ADAPTER=json
+if [ "$(uname -s)" = Darwin ]; then
+  # need gnu date for consistency; 'brew install date'
+  DATE=gdate
+else
+  DATE=date
+fi
+
 
 setup_data_dir() {
   if [ ! -e "$BENCHMARK" ]; then
