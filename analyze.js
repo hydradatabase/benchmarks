@@ -63,11 +63,12 @@ const run = async () => {
   results['total'] = results['queries'] = 0;
   for (const key in entries) {
     const entry = entries[key];
-    const avg = entry.value / entry.count;
-    results[key] = avg;
-    results['total'] += avg;
+    // compute average for numeric keys, otherwise use total value
+    const result = Number.isNaN(Number(key)) ? entry.value : entry.value / entry.count;
+    results[key] = result;
+    results['total'] += result;
     if (!Number.isNaN(Number(key))) {
-      results['queries'] += avg;
+      results['queries'] += result;
     }
   }
 

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 if [ -z "${RUNTIME}" ] ; then
   RUNTIME=`date "+%Y-%m-%d.%H:%M:%S"`
 fi
@@ -88,7 +90,7 @@ fi
 for query in $BENCHMARK/queries/*; do
   sync
   echo 3 | tee /proc/sys/vm/drop_caches
-  file=`echo $query | cut -f 3 -d '/'`
+  file="$(basename $query)"
   for i in $(seq 1 $TRIES); do
     psql -U $USER $BENCHMARK -f variants/$VARIANT/query.sql -f $query >$PATHNAME/$file-$i.out
   done
