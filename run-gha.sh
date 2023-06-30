@@ -80,6 +80,7 @@ upload_result_to_bencher() {
       --else-if-branch main \
       --backdate $(cat unix-timestamp.txt) \
       --project "$BENCHER_PROJECT" \
+      --adapter "$BENCHER_ADAPTER" \
       "cat ./analyze-bencher.json"
   else
     bencher run \
@@ -87,6 +88,7 @@ upload_result_to_bencher() {
       --else-if-branch "$GITHUB_BASE_REF" \
       --else-if-branch main \
       --project "$BENCHER_PROJECT" \
+      --adapter "$BENCHER_ADAPTER" \
       "cat ./analyze-bencher.json"
   fi
   set -u
