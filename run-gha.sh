@@ -132,14 +132,13 @@ cleanup_files() {
 
 run() {
   setup_data_dir
-  [ $DOWNLOAD_DATA = true ] && download_data
+  [ $DOWNLOAD_DATA = true ] && download_data || true
   prepare_data
   run_benchmark
   analyze_results
-  [ $UPLOAD_RESULTS_TO_S3 = true ] && upload_result_to_s3
-  [ $UPLOAD_RESULTS_TO_BENCHER = true ] && upload_result_to_bencher
-  [ $CLEANUP_FILES = true ] && cleanup_files
+  [ $UPLOAD_RESULTS_TO_S3 = true ] && upload_result_to_s3 || true
+  [ $UPLOAD_RESULTS_TO_BENCHER = true ] && upload_result_to_bencher || true
+  [ $CLEANUP_FILES = true ] && cleanup_files || true
 }
 
 ${1:-run}
-exit 0
