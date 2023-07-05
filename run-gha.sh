@@ -78,7 +78,7 @@ upload_result_to_bencher() {
       --if-branch "$GITHUB_REF_NAME" \
       --else-if-branch "$GITHUB_BASE_REF" \
       --else-if-branch main \
-      --backdate $(cat unix-timestamp.txt)000 \
+      --backdate $(cat unix-timestamp.txt) \
       --project "$BENCHER_PROJECT" \
       --adapter "$BENCHER_ADAPTER" \
       "cat ./analyze-bencher.json"
