@@ -74,12 +74,18 @@ fi
 mkdir -p $PATHNAME
 
 
-if [ "$LOAD" = true ] ; then
-  psql -U $USER -c "CREATE DATABASE \"$BENCHMARK\""
+if [ -z "$DATABASE_URL" ]; then
+  PSQL="psql -U $USER"
+else
+  PSQL="psql $DATABASE_URL"
 fi
 
-psql -U $USER $BENCHMARK -f variants/$VARIANT/setup.sql -f $BENCHMARK/setup.sql >$PATHNAME/setup.out 2>$PATHNAME/setup.err
-psql -U $USER $BENCHMARK -f variants/$VARIANT/data.sql -f $BENCHMARK/data.sql >$PATHNAME/data.out 2>$PATHNAME/data.err
+if [ "$LOAD" = true ] ; then
+  $PSQL -c "CREATE DATABASE \"$BENCHMARK\""
+fi
+
+$PSQL $BENCHMARK -f variants/$VARIANT/setup.sql -f $BENCHMARK/setup.sql >$PATHNAME/setup.out 2>$PATHNAME/setup.err
+$PSQL $BENCHMARK -f variants/$VARIANT/data.sql -f $BENCHMARK/data.sql >$PATHNAME/data.out 2>$PATHNAME/data.err
 
 if [ "$(cat $PATHNAME/*.err | grep -v NOTICE | wc -l)" != "0" ]; then
   echo Error detected:
@@ -88,11 +94,13 @@ if [ "$(cat $PATHNAME/*.err | grep -v NOTICE | wc -l)" != "0" ]; then
 fi
 
 for query in $BENCHMARK/queries/*; do
-  sync
-  echo 3 | tee /proc/sys/vm/drop_caches
+  if [ -z "$DATABASE_URL" ]; then
+    sync
+    echo 3 | tee /proc/sys/vm/drop_caches
+  fi
   file="$(basename $query)"
   for i in $(seq 1 $TRIES); do
-    psql -U $USER $BENCHMARK -f variants/$VARIANT/query.sql -f $query >$PATHNAME/$file-$i.out
+    $PSQL $BENCHMARK -f variants/$VARIANT/query.sql -f $query >$PATHNAME/$file-$i.out
   done
 done
 
@@ -101,5 +109,5 @@ if [ "$ANALYZE" = true ] ; then
 fi
 
 if [ "$LOAD" = true ] ; then
-  psql -U $USER -c "DROP DATABASE \"$BENCHMARK\""
+  $PSQL -c "DROP DATABASE \"$BENCHMARK\""
 fi

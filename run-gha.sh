@@ -95,12 +95,16 @@ upload_result_to_bencher() {
 }
 
 run_benchmark() {
-  docker run -d -e POSTGRES_HOST_AUTH_METHOD=trust -v $PWD:/benchmarks -m 12288m --cpus=4 --shm-size=1024m --name=$CONTAINER_NAME $REPO:$TAG
-  trap "stop_docker; exit 1" SIGINT ERR
-  sleep 15
-  docker exec $CONTAINER_NAME /bin/sh -c "RUNTIME=$RUNTIME /benchmarks/run-benchmark.sh -z -b $BENCHMARK -v $VARIANT -u postgres"
-  stop_docker
-  trap - SIGINT ERR
+  if [ -z "$DATABASE_URL" ]; then
+    docker run -d -e POSTGRES_HOST_AUTH_METHOD=trust -v $PWD:/benchmarks -m 12288m --cpus=4 --shm-size=1024m --name=$CONTAINER_NAME $REPO:$TAG
+    trap "stop_docker; exit 1" SIGINT ERR
+    sleep 15
+    docker exec $CONTAINER_NAME /bin/sh -c "RUNTIME=$RUNTIME /benchmarks/run-benchmark.sh -z -b $BENCHMARK -v $VARIANT -u postgres"
+    stop_docker
+    trap - SIGINT ERR
+  else
+    DATABASE_URL="$DATABASE_URL" RUNTIME=$RUNTIME ./run-benchmark.sh -z -b $BENCHMARK -v $VARIANT
+  fi
 }
 
 stop_docker() {
